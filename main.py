@@ -3,7 +3,7 @@ from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
 import os
 
-channel_handle = 'ManboW_Kaigai_Meme' # Change this to the correct channel handle
+channel_handles = ['Akane-JapaneseClass','ManboW_Kaigai_Meme','Midnight_Moon','naasuke','pockysweets','pyonandsayana','rekijo','中国見聞']
 
 # Load environment variables from .env file
 load_dotenv()
@@ -18,63 +18,63 @@ except HttpError as e:
     print(f"An error occurred while initializing the YouTube API client: {e}")
     exit()
 
-# Make a request to the YouTube API
-try:
-    request = youtube.channels().list(
-        part='contentDetails',
-        forHandle=channel_handle
-    )
-    response = request.execute()
-    print(response)  # Debug: print the API response
-except HttpError as e:
-    print(f"An error occurred while making the API request: {e}")
-    exit()
-
-# Check if 'items' key exists in the response
-if 'items' not in response or not response['items']:
-    print("No items found in the response. Please check the channel username.")
-    exit()
-
-# Retrieve the uploads playlist ID for the given channel
-playlist_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-
-# Retrieve all videos from the uploads playlist
-videos = []
-next_page_token = None
-
-while True:
+for channel_handle in channel_handles:
+    # Make a request to the YouTube API
     try:
-        playlist_items_response = youtube.playlistItems().list(
-            part='snippet',
-            playlistId=playlist_id,
-            maxResults=50,
-            pageToken=next_page_token
-        ).execute()
+        request = youtube.channels().list(
+            part='contentDetails',
+            forHandle=channel_handle
+        )
+        response = request.execute()
+        print(response)  # Debug: print the API response
     except HttpError as e:
-        print(f"An error occurred while fetching playlist items: {e}")
-        break
+        print(f"An error occurred while making the API request: {e}")
+        exit()
 
-    videos += playlist_items_response['items']
-    next_page_token = playlist_items_response.get('nextPageToken')
+    # Check if 'items' key exists in the response
+    if 'items' not in response or not response['items']:
+        print("No items found in the response. Please check the channel username.")
+        exit()
 
-    if not next_page_token:
-        break
+    # Retrieve the uploads playlist ID for the given channel
+    playlist_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
-# Extract video URLs and titles
-video_urls = [
-    {
-        'ID': video['snippet']['resourceId']['videoId'],
-        'Title': video['snippet']['title'],
-        'PublishedAt': video['snippet']['publishedAt']
-    }
-    for video in videos
-]
+    # Retrieve all videos from the uploads playlist
+    videos = []
+    next_page_token = None
 
-# Write video URLs and titles to a file
-with open(f"youtube_videos/{channel_handle}_YoutubeVideos.txt", "w", encoding="utf-8") as outFile:
-    outFile.write("ID,PublishedAt\n")
-    for video in video_urls:
-        line = f"{video['ID']},{video['PublishedAt']}\n"
-        outFile.write(line)
+    while True:
+        try:
+            playlist_items_response = youtube.playlistItems().list(
+                part='snippet',
+                playlistId=playlist_id,
+                maxResults=50,
+                pageToken=next_page_token
+            ).execute()
+        except HttpError as e:
+            print(f"An error occurred while fetching playlist items: {e}")
+            break
 
-print("Video IDs, titles and publish dates have been saved to 'YoutubeVideos.txt'.")
+        videos += playlist_items_response['items']
+        next_page_token = playlist_items_response.get('nextPageToken')
+
+        if not next_page_token:
+            break
+
+    # Extract video URLs and titles
+    video_IDs = [
+        {
+            'ID': video['snippet']['resourceId']['videoId'],
+            'PublishedAt': video['snippet']['publishedAt']
+        }
+        for video in videos
+    ]
+
+    # Write video URLs and titles to a file
+    with open(f"youtube_videos/{channel_handle}_YoutubeVideos.txt", "w", encoding="utf-8") as outFile:
+        outFile.write("ID,PublishedAt\n")
+        for video in video_IDs:
+            line = f"{video['ID']},{video['PublishedAt']}\n"
+            outFile.write(line)
+
+    print(f"Video IDs, titles and publish dates have been saved to '{channel_handle}_YoutubeVideos.txt'.")
