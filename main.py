@@ -3,6 +3,8 @@ from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
 import os
 
+channel_handle = 'ManboW_Kaigai_Meme' # Change this to the correct channel handle
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -20,7 +22,7 @@ except HttpError as e:
 try:
     request = youtube.channels().list(
         part='contentDetails',
-        forHandle='dragunilla'  # Change this to the correct channel handle
+        forHandle=channel_handle
     )
     response = request.execute()
     print(response)  # Debug: print the API response
@@ -61,17 +63,18 @@ while True:
 # Extract video URLs and titles
 video_urls = [
     {
-        'URL': f"https://www.youtube.com/watch?v={video['snippet']['resourceId']['videoId']}",
-        'Title': video['snippet']['title']
+        'ID': video['snippet']['resourceId']['videoId'],
+        'Title': video['snippet']['title'],
+        'PublishedAt': video['snippet']['publishedAt']
     }
     for video in videos
 ]
 
 # Write video URLs and titles to a file
-with open("YoutubeVideos.txt", "w", encoding="utf-8") as outFile:
-    outFile.write("URL,Title\n")
+with open(f"youtube_videos/{channel_handle}_YoutubeVideos.txt", "w", encoding="utf-8") as outFile:
+    outFile.write("ID,PublishedAt\n")
     for video in video_urls:
-        line = f"{video['URL']},{video['Title']}\n"
+        line = f"{video['ID']},{video['PublishedAt']}\n"
         outFile.write(line)
 
-print("Video URLs and titles have been saved to 'YoutubeVideos.txt'.")
+print("Video IDs, titles and publish dates have been saved to 'YoutubeVideos.txt'.")
