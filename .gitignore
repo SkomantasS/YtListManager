@@ -1,6 +1,4 @@
 token files/*
-youtube_videos/*
-youtube_videos_combined_list/*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
