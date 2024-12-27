@@ -23,15 +23,18 @@ def read_ids_from_file(file_path):
     
     return ids
 
+load_dotenv()
 client_file = os.getenv("CLIENT_FILE")
 yt = YouTube(client_file)
 yt.init_service()
 
-response_playlist = yt.create_playlist(title='TestT')
-playlist_id = response_playlist.get('id')
-playlist_title = response_playlist['snippet']['title']
-
 video_ids = read_ids_from_file('youtube_videos_combined_list/combined_and_sorted_videos.txt')
+iteration = 0
+video_ids = video_ids[150+200*iteration:150+200*(1+iteration)-1]
+
+playlist_id = os.getenv("PLAYLIST")
+playlist_title = '日本語'
+
 for video_id in video_ids:
     request_body = {
         'snippet': {
