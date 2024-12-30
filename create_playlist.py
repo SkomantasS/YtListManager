@@ -29,8 +29,9 @@ yt = YouTube(client_file)
 yt.init_service()
 
 video_ids = read_ids_from_file('youtube_videos_combined_list/combined_and_sorted_videos.txt')
-iteration = 0
-video_ids = video_ids[150+200*iteration:150+200*(1+iteration)-1]
+iteration = 3
+
+video_ids = video_ids[200*iteration:200*(1+iteration)]
 
 playlist_id = os.getenv("PLAYLIST")
 playlist_title = '日本語'

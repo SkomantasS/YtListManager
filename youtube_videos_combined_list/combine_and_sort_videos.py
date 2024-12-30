@@ -1,6 +1,11 @@
 import os
 import csv
 from datetime import datetime
+from dotenv import load_dotenv
+import matplotlib.pyplot as plt
+
+load_dotenv()
+channel_handles = os.getenv("CHANNEL_HANDLES").split(',')
 
 # Directory containing the .txt files
 INPUT_DIR = "./youtube_videos"  # Change this to the directory containing your .txt files
@@ -52,5 +57,37 @@ def main():
     save_to_file(sorted_data, OUTPUT_FILE)
     print(f"Sorted data has been saved to '{OUTPUT_FILE}'.")
 
+def check_channel_video_proportions():
+    combined_data = []
+    channel_videos = [0] * len(channel_handles)
+
+    # Iterate over all .txt files in the input directory
+    for file_name in os.listdir(INPUT_DIR):
+        if file_name.endswith(".txt"):
+            file_path = os.path.join(INPUT_DIR, file_name)
+            
+            # Read the .txt file
+            with open(file_path, "r", encoding="utf-8") as file:
+                reader = csv.DictReader(file)  # Read as dictionary for 'ID' and 'PublishedAt'
+                for row in reader:
+                    if datetime.fromisoformat(row["PublishedAt"].replace("Z", "+00:00")) < datetime.fromisoformat('2024-01-01T00:00:00+00:00'):
+                        pass
+                    else:
+                        channel_videos[channel_handles.index(file_name.replace("_YoutubeVideos.txt", ""))] += 1
+                        combined_data.append({
+                            "ID": row["ID"],
+                            "PublishedAt": row["PublishedAt"]
+                        })
+    
+    # Create a pie chart
+    plt.figure(figsize=(10, 7))
+    plt.pie(channel_videos, labels=channel_handles, autopct='%1.1f%%', startangle=140)
+    plt.title('Proportion of Videos per Channel')
+    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+    # Save the pie chart as an image file
+    plt.show()
+
 if __name__ == "__main__":
-    main()
+    # main()
+    check_channel_video_proportions()

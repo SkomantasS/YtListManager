@@ -3,12 +3,8 @@ from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
 import os
 
-channel_handles = ['Akane-JapaneseClass','ManboW_Kaigai_Meme','Midnight_Moon','naasuke','pockysweets','pyonandsayana','rekijo','中国見聞']
-
-# Load environment variables from .env file
 load_dotenv()
-
-# Access the API key
+channel_handles = os.getenv("CHANNEL_HANDLES").split(',')
 api_key = os.getenv("API_KEY")
 
 # Initialize YouTube API client
@@ -65,16 +61,17 @@ for channel_handle in channel_handles:
     video_IDs = [
         {
             'ID': video['snippet']['resourceId']['videoId'],
-            'PublishedAt': video['snippet']['publishedAt']
+            'PublishedAt': video['snippet']['publishedAt'],
+            'Duration': video['contentDetails']['duration']
         }
         for video in videos
     ]
 
     # Write video URLs and titles to a file
     with open(f"youtube_videos/{channel_handle}_YoutubeVideos.txt", "w", encoding="utf-8") as outFile:
-        outFile.write("ID,PublishedAt\n")
+        outFile.write("ID,PublishedAt,Duration\n")
         for video in video_IDs:
-            line = f"{video['ID']},{video['PublishedAt']}\n"
+            line = f"{video['ID']},{video['PublishedAt']},{video['Duration']}\n"
             outFile.write(line)
 
-    print(f"Video IDs, titles and publish dates have been saved to '{channel_handle}_YoutubeVideos.txt'.")
+    print(f"Video IDs, publish dates and durations have been saved to '{channel_handle}_YoutubeVideos.txt'.")
