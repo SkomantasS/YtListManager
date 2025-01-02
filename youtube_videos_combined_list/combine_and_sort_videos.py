@@ -3,12 +3,13 @@ import csv
 from datetime import datetime
 from dotenv import load_dotenv
 import matplotlib.pyplot as plt
+import isodate
 
 load_dotenv()
 channel_handles = os.getenv("CHANNEL_HANDLES").split(',')
 
 # Directory containing the .txt files
-INPUT_DIR = "./youtube_videos"  # Change this to the directory containing your .txt files
+INPUT_DIR = "./video_details"  # Change this to the directory containing your .txt files
 
 # Output file
 OUTPUT_FILE = "youtube_videos_combined_list/combined_and_sorted_videos.txt"
@@ -30,7 +31,8 @@ def read_and_combine_files(input_dir,start_date='2000-01-01T00:00:00+00:00'):
                     else:
                         combined_data.append({
                             "ID": row["ID"],
-                            "PublishedAt": row["PublishedAt"]
+                            "PublishedAt": row["PublishedAt"],
+                            "Duration": row["Duration"]
                         })
 
     return combined_data
@@ -42,9 +44,14 @@ def sort_by_published_date(data):
 def save_to_file(sorted_data, output_file):
     # Save the sorted data to the output file
     with open(output_file, "w", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=["ID", "PublishedAt"])
+        writer = csv.DictWriter(file, fieldnames=["ID", "PublishedAt", "Duration"])
         writer.writeheader()
         writer.writerows(sorted_data)
+
+# Convert ISO 8601 duration to human-readable format
+def convert_iso8601_to_readable(iso_duration):
+    duration = isodate.parse_duration(iso_duration)
+    return duration.total_seconds()
 
 def main():
     # Step 1: Read and combine data from all .txt files
@@ -60,6 +67,7 @@ def main():
 def check_channel_video_proportions():
     combined_data = []
     channel_videos = [0] * len(channel_handles)
+    average_duration = [0] * len(channel_handles)
 
     # Iterate over all .txt files in the input directory
     for file_name in os.listdir(INPUT_DIR):
@@ -73,12 +81,18 @@ def check_channel_video_proportions():
                     if datetime.fromisoformat(row["PublishedAt"].replace("Z", "+00:00")) < datetime.fromisoformat('2024-01-01T00:00:00+00:00'):
                         pass
                     else:
-                        channel_videos[channel_handles.index(file_name.replace("_YoutubeVideos.txt", ""))] += 1
+                        channel_videos[channel_handles.index(file_name.replace("_VideoDetails.txt", ""))] += convert_iso8601_to_readable(row["Duration"])
+                        average_duration[channel_handles.index(file_name.replace("_VideoDetails.txt", ""))] += 1
                         combined_data.append({
                             "ID": row["ID"],
-                            "PublishedAt": row["PublishedAt"]
+                            "PublishedAt": row["PublishedAt"],
+                            "Duration": row["Duration"]
                         })
     
+    for i in range(len(channel_videos)):
+        average_duration[i] = channel_videos[i] / average_duration[i]
+    print(average_duration)
+
     # Create a pie chart
     plt.figure(figsize=(10, 7))
     plt.pie(channel_videos, labels=channel_handles, autopct='%1.1f%%', startangle=140)
@@ -89,5 +103,5 @@ def check_channel_video_proportions():
     plt.show()
 
 if __name__ == "__main__":
-    # main()
-    check_channel_video_proportions()
+    main()
+    # check_channel_video_proportions()
