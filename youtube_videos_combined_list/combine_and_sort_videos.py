@@ -53,6 +53,13 @@ def convert_iso8601_to_readable(iso_duration):
     duration = isodate.parse_duration(iso_duration)
     return duration.total_seconds()
 
+def make_autopct(values):
+    def my_autopct(pct):
+        total = sum(values)
+        val = int(round(pct*total/100.0))
+        return '{p:.2f}%  ({v:d})'.format(p=pct,v=val)
+    return my_autopct
+
 def main():
     # Step 1: Read and combine data from all .txt files
     combined_data = read_and_combine_files(INPUT_DIR,'2024-01-01T00:00:00+00:00')
@@ -93,9 +100,10 @@ def check_channel_video_proportions():
         average_duration[i] = channel_videos[i] / average_duration[i]
     print(average_duration)
 
+    values = average_duration #[x / 60 for x in average_duration]
     # Create a pie chart
     plt.figure(figsize=(10, 7))
-    plt.pie(channel_videos, labels=channel_handles, autopct='%1.1f%%', startangle=140)
+    plt.pie(values, labels=channel_handles, autopct=make_autopct(values), startangle=140)
     plt.title('Proportion of Videos per Channel')
     plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
@@ -103,5 +111,5 @@ def check_channel_video_proportions():
     plt.show()
 
 if __name__ == "__main__":
-    main()
-    # check_channel_video_proportions()
+    # main()
+    check_channel_video_proportions()
