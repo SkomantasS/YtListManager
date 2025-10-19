@@ -3,17 +3,6 @@ from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-channel_handles = os.getenv("CHANNEL_HANDLES").split(',')
-api_key = os.getenv("API_KEY")
-
-# Initialize YouTube API client
-try:
-    youtube = build('youtube', 'v3', developerKey=api_key)
-except HttpError as e:
-    print(f"An error occurred while initializing the YouTube API client: {e}")
-    exit()
-
 # Fetch all video IDs from the uploads playlist of a channel
 def get_video_ids(playlist_id):
     video_ids = []
@@ -106,4 +95,15 @@ def main():
         print(f"Details for channel '{channel_handle}' have been saved to '{output_file}'.")
 
 if __name__ == "__main__":
+    load_dotenv()
+    channel_handles = os.getenv("CHANNEL_HANDLES").split(',')
+    api_key = os.getenv("API_KEY")
+
+    # Initialize YouTube API client
+    try:
+        youtube = build('youtube', 'v3', developerKey=api_key)
+    except HttpError as e:
+        print(f"An error occurred while initializing the YouTube API client: {e}")
+        exit()
+    
     main()

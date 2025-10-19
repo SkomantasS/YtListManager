@@ -14,7 +14,7 @@ INPUT_DIR = "./video_details"  # Change this to the directory containing your .t
 # Output file
 OUTPUT_FILE = "youtube_videos_combined_list/combined_and_sorted_videos.txt"
 
-def read_and_combine_files(input_dir,start_date='2000-01-01T00:00:00+00:00'):
+def read_and_combine_files(input_dir,start_date='2000-01-01T00:00:00+00:00',end_date='9999-12-31T23:59:59+00:00'):
     combined_data = []
 
     # Iterate over all .txt files in the input directory
@@ -26,14 +26,14 @@ def read_and_combine_files(input_dir,start_date='2000-01-01T00:00:00+00:00'):
             with open(file_path, "r", encoding="utf-8") as file:
                 reader = csv.DictReader(file)  # Read as dictionary for 'ID' and 'PublishedAt'
                 for row in reader:
-                    if datetime.fromisoformat(row["PublishedAt"].replace("Z", "+00:00")) < datetime.fromisoformat(start_date):
-                        pass
-                    else:
+                    if  datetime.fromisoformat(start_date) <= datetime.fromisoformat(row["PublishedAt"].replace("Z", "+00:00")) <= datetime.fromisoformat(end_date):
                         combined_data.append({
                             "ID": row["ID"],
                             "PublishedAt": row["PublishedAt"],
                             "Duration": row["Duration"]
                         })
+                    else:
+                        pass
 
     return combined_data
 
@@ -62,7 +62,7 @@ def make_autopct(values):
 
 def main():
     # Step 1: Read and combine data from all .txt files
-    combined_data = read_and_combine_files(INPUT_DIR,'2024-01-01T00:00:00+00:00')
+    combined_data = read_and_combine_files(INPUT_DIR,'2024-01-01T00:00:00+00:00','2024-12-31T23:59:59+00:00')
     
     # Step 2: Sort the combined data by 'PublishedAt'
     sorted_data = sort_by_published_date(combined_data)
@@ -100,7 +100,7 @@ def check_channel_video_proportions():
         average_duration[i] = channel_videos[i] / average_duration[i]
     print(average_duration)
 
-    values = average_duration #[x / 60 for x in average_duration]
+    values = channel_videos #[x / 60 for x in average_duration]
     # Create a pie chart
     plt.figure(figsize=(10, 7))
     plt.pie(values, labels=channel_handles, autopct=make_autopct(values), startangle=140)
@@ -111,5 +111,5 @@ def check_channel_video_proportions():
     plt.show()
 
 if __name__ == "__main__":
-    # main()
-    check_channel_video_proportions()
+    main()
+    # check_channel_video_proportions()
