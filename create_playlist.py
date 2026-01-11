@@ -30,16 +30,13 @@ if __name__ == "__main__":
     yt.init_service()
 
     video_ids = read_ids_from_file('youtube_videos_combined_list/combined_and_sorted_videos.txt')
-    # iteration = 3
 
-    # video_ids = video_ids[200*iteration:200*(1+iteration)]
+    iteration = 0
 
-    iteration = 11
-
-    # video_ids = video_ids[100*iteration:100*(1+iteration)]
-    video_ids = video_ids[1050:1199]
+    # video_ids = video_ids[10*iteration:10*(1+iteration)]
+    video_ids = video_ids[50:100]
     playlist_id = os.getenv("PLAYLIST")
-    playlist_title = '日本語'
+    playlist_title = '日本語2026'
 
     for video_id in video_ids:
         request_body = {

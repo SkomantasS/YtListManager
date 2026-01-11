@@ -62,7 +62,7 @@ def make_autopct(values):
 
 def main():
     # Step 1: Read and combine data from all .txt files
-    combined_data = read_and_combine_files(INPUT_DIR,'2024-01-01T00:00:00+00:00','2024-12-31T23:59:59+00:00')
+    combined_data = read_and_combine_files(INPUT_DIR,'2025-01-01T00:00:00+00:00','2025-12-31T23:59:59+00:00')
     
     # Step 2: Sort the combined data by 'PublishedAt'
     sorted_data = sort_by_published_date(combined_data)
