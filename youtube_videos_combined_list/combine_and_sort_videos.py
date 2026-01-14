@@ -26,7 +26,7 @@ def read_and_combine_files(input_dir,start_date='2000-01-01T00:00:00+00:00',end_
             with open(file_path, "r", encoding="utf-8") as file:
                 reader = csv.DictReader(file)  # Read as dictionary for 'ID' and 'PublishedAt'
                 for row in reader:
-                    if  datetime.fromisoformat(start_date) <= datetime.fromisoformat(row["PublishedAt"].replace("Z", "+00:00")) <= datetime.fromisoformat(end_date):
+                    if  datetime.fromisoformat(start_date) <= datetime.fromisoformat(row["PublishedAt"].replace("Z", "+00:00")) <= datetime.fromisoformat(end_date) and convert_iso8601_to_readable(row["Duration"]) >= 30:
                         combined_data.append({
                             "ID": row["ID"],
                             "PublishedAt": row["PublishedAt"],

@@ -33,8 +33,10 @@ if __name__ == "__main__":
 
     iteration = 0
 
-    # video_ids = video_ids[10*iteration:10*(1+iteration)]
-    video_ids = video_ids[50:100]
+    first_video = 101
+    last_video = 200
+    video_ids = video_ids[first_video-1:last_video]
+    
     playlist_id = os.getenv("PLAYLIST")
     playlist_title = '日本語2026'
 
